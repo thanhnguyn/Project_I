@@ -1,0 +1,19 @@
+.Content__formInputAreaRole{
+    width: 45rem;
+    height: 3rem;
+    line-height: 3rem;
+    font-size: 1.6rem;
+    padding: 0.5rem 2rem;
+    padding-left: 2rem;
+    margin: 0.5rem;
+    border-radius: 1rem;
+    border: none;
+    background-color: var(--mau-4);
+    align-self: center;
+    flex: 2;
+}
+
+.content__layout1p3FormDelete{
+    display: flex;
+    flex-direction: column;
+}

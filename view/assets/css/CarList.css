@@ -1,0 +1,81 @@
+/* Thêm CSS để tạo giao diện cho thẻ thông tin */
+.card_content{
+    width: 50%;
+}
+.card {
+    display: flex;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+    cursor: pointer;
+    height: fit-content;
+    background-color: white;
+    border: outset;
+    border-radius: 1rem;
+  }
+  
+  .card img {
+    width: 33%;
+    height: 100%;
+  }
+  
+  .card .content {
+    padding: 10px;
+  }
+  
+  /* Ẩn nội dung chi tiết ban đầu */
+  .details {
+    display: none;
+    border: 1px solid #ddd;
+    padding-left: 2rem;
+    background-color: ghostwhite;
+    border-radius: 1rem;
+
+  }
+
+  .content__layout2p15 {
+    width: 90%;
+    position: relative;
+    background-color: var(--mau-4);
+    border-radius: 1rem;
+    align-self: center;
+    padding: 1rem;
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+  }
+
+  button {
+    position: absolute;
+    border-radius: 50px;
+    border: none;
+    background-color: var(--mau-2);
+    /* top: 3.9rem; */
+    bottom: 0.7rem;
+    right: 1rem;
+    color: #fff;
+    font-size: 14px;
+    height: 30px;
+    /* line-height: 1.4rem; */
+    transition: background-color 0.5s ease-out;
+    transition: color 0.5s ease-out;
+  }
+
+  input#searchInput {
+    width: 80%;
+    background-color: var(--mau-4);
+    border-radius: 1rem;
+    margin: 0.5rem 0;
+}
+
+input#searchSeats {
+  width: 80%;
+  background-color: var(--mau-4);
+  border-radius: 1rem;
+  margin: 0.5rem 0;
+}
+
+input#searchYear {
+  width: 80%;
+  background-color: var(--mau-4);
+  border-radius: 1rem;
+  margin: 0.5rem 0;
+}

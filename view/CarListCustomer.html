@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="./assets/img/logo.png"/>
+    <link rel="stylesheet" href="./assets/fonts/themify-icons/themify-icons.css">
+    <link rel="stylesheet" href="./assets/css/preset.css">
+    <link rel="stylesheet" href="./assets/css/base.css">
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/home.css">
+    <link rel="stylesheet" href="./assets/css/listAccountAdmin.css">
+    <link rel="stylesheet" href="./assets/css/CarList.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap&subset=vietnamese" rel="stylesheet">
+    <title>Car List</title>
+
+    <!-- Thêm vào đầu trang HTML, trong thẻ <head> -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const carTableBody = document.getElementById('carTableBody');
+  const searchInput = document.getElementById('searchInput');
+
+  // Lấy dữ liệu từ API
+  fetch('/getCarModels')
+    .then(response => response.json())
+    .then(data => {
+      // Lưu trữ toàn bộ dữ liệu xe để sử dụng cho tìm kiếm
+      const allCars = data;
+
+      // Hiển thị thông tin ban đầu
+      displayCars(data);
+
+      // Sự kiện khi người dùng nhập vào ô tìm kiếm
+      searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filteredCars = allCars.filter(car => 
+          car.Name.toLowerCase().includes(searchTerm) || 
+          car.Brand.toLowerCase().includes(searchTerm)
+        );
+        
+        // Hiển thị danh sách xe đã lọc
+        displayCars(filteredCars);
+      });
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+  function displayCars(cars) {
+    // Xóa toàn bộ dữ liệu trong tbody
+    carTableBody.innerHTML = '';
+
+    // Hiển thị thông tin xe
+    cars.forEach(car => {
+      const card = createCarCard(car);
+      const row = carTableBody.insertRow();
+      const cell = row.insertCell(0);
+      cell.appendChild(card);
+    });
+  }
+
+  
+
+  function createCarCard(car) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    // Thêm thẻ ảnh vào thẻ thông tin
+    const image = document.createElement('img');
+    image.src = car.ImageURL;
+    image.alt = car.Name;
+    card.appendChild(image);
+
+    // Thêm thẻ nội dung vào thẻ thông tin
+    const card_content = document.createElement('div');
+    card_content.classList.add('card_content');
+    card_content.innerHTML = `<p>${car.Introduction}</p>`;
+    card.appendChild(card_content);
+
+    // Thêm sự kiện click để hiển thị thông tin chi tiết
+    card.addEventListener('click', () => {
+      // Hiển thị hoặc ẩn thông tin chi tiết khi nhấp vào thẻ
+      const details = document.getElementById(`details-${car.Name}`);
+      details.style.display = details.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Thêm thẻ chi tiết và ẩn nó ban đầu
+    const details = document.createElement('div');
+    details.classList.add('details');
+    details.id = `details-${car.Name}`;
+    details.innerHTML = `<p><strong>Tên xe:</strong> ${car.Name}</p>
+                         <p><strong>Năm:</strong> ${car.Year}</p>
+                         <p><strong>Loại động cơ:</strong> ${car.EngineType}</p>
+                         <p><strong>Loại nhiên liệu:</strong> ${car.FuelType}</p>
+                         <p><strong>Hộp số:</strong> ${car.Transmission}</p>
+                         <p><strong>Số chỗ ngồi:</strong> ${car.Seats}</p>`;
+    card.appendChild(details);
+
+    return card;
+  }
+});
+
+
+  </script>
+  
+</head>
+<body>
+    <div class="header">
+        <ul class="header__navleft">
+          <li class="header__listItem"><a class="header__link" href="homeCustomer.html"><img class="header__logo" src="./assets/img/Rent Car Taxi Cab Logo.png" alt="logo"></a></li>
+          <li class="header__listItem"><a class="header__link" href="homeCustomer.html">Trang Chủ</a></li>
+        </ul>
+        <ul class="header__navright">
+          <li class="header__listItem"><a class="header__link" href="signin.html">Đăng xuất</a></li>
+          <li class="header__listItem"><a class="header__link" href="helpCustomer.html">Hỗ Trợ</a></li>
+        </ul>
+      </div>
+    
+        <div class="content">
+          <div class="content__sidebar">
+            <p class="content__sidebarHeading">Chức năng</p>
+            <ul class="content__sidebarList">
+              <li class="content__sidebarItem"><a class="content__sidebarFunction" href="CarListCustomer.html">Danh sách xe</a></li>
+              <li class="content__sidebarItem"><a class="content__sidebarFunction" href="RentCarCustomer.html">Thuê xe </a></li>
+            </ul>
+          </div>
+        <div class="content__main">
+          <div class="content__layout2">
+              <div class="content__layout2p1">
+                <p class="content__layout2p1Heading">Danh sách xe</p>
+              </div>
+              <div class="content__layout2p15">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên hoặc hãng...">
+                <input type="text" id="searchSeats" placeholder="Tìm kiếm theo số chỗ ngồi...">
+                <input type="text" id="searchYear" placeholder="Tìm kiếm theo năm sản xuất...">
+                <button onclick="searchCars()">Tìm kiếm</button>
+                <script>function searchCars() {
+                  const searchInput = document.getElementById('searchInput');
+                  const searchSeats = document.getElementById('searchSeats');
+                  const searchYear = document.getElementById('searchYear');
+                
+                  const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                  const searchSeatsValue = searchSeats ? parseInt(searchSeats.value) : NaN;
+                  const searchYearValue = searchYear ? parseInt(searchYear.value) : NaN;
+                
+                  const cards = document.getElementsByClassName('card');
+                
+                  Array.from(cards).forEach(card => {
+                    const cardContent = card.querySelector('.card_content p').textContent.toLowerCase();
+                    const seatsContent = card.querySelector('.details p:nth-child(6)').textContent;
+                    const yearContent = card.querySelector('.details p:nth-child(2)').textContent;
+                    
+                    // Kiểm tra xem có nhập liệu tìm kiếm không
+                    const hasSearchTerm = searchTerm !== '';
+                    const hasSearchSeats = !isNaN(searchSeatsValue);
+                    const hasSearchYear = !isNaN(searchYearValue);
+                
+                    // Kiểm tra xem chúng có chứa các tiêu chí tìm kiếm không
+                    const matchesSearchTerm = hasSearchTerm && cardContent.includes(searchTerm);
+                    const matchesSeats = hasSearchSeats && parseInt(seatsContent.split(':')[1].trim()) === searchSeatsValue;
+                    const matchesYear = hasSearchYear && parseInt(yearContent.split(':')[1].trim()) === searchYearValue;
+                
+                    // Hiển thị hoặc ẩn card dựa trên kết quả kiểm tra
+                    card.style.display = (hasSearchTerm && !matchesSearchTerm) || (hasSearchSeats && !matchesSeats) || (hasSearchYear && !matchesYear) ? 'none' : 'flex';
+                  });
+                }
+                
+                  </script>
+              </div>
+              <div class="content__layout2p2">
+
+                <!-- Thêm id cho bảng trong thẻ <table> -->
+<table id="carModelsTable" class="hidden">
+    <thead>
+      <tr style = "display: none;">
+        <th>Tên xe</th>
+        <th>Năm sản xuất</th>
+        <th>Loại động cơ</th>
+        <th>Loại nhiên liệu</th>
+        <th>Hộp số</th>
+        <th>Số chỗ ngồi</th>
+        <th>Giới thiệu</th>
+        <th>Hình ảnh</th>
+      </tr>
+    </thead>
+    <tbody id="carTableBody"></tbody>
+  </table>
+  
+ 
+                
+              </div>
+          </div>
+        </div>
+    </div>
+
+    <div id="footer">
+        <div class="footer">
+              <footer class="footer">
+                  <div class="footer__p1">
+                    <p class="footer--h1">Công ty cho thuê xe Takehiro</p>
+                    <div class="footer--h2"> <i class="ti-location-pin"></i>
+                      <a class="footer__link" href="https://goo.gl/maps/GX8fSM2AWNVL1nPk6"> Số 10 Giải Phóng, Hai Bà Trưng, Hà Nội</a>   
+                      <div class="map-box"><img class="maps" src="./assets/img/AddressCpn.png" alt=""> </div>
+                    </div>
+                    <div class="clear"></div>
+                    <p class="footer--h2"> 
+                      <i class="ti-file"></i> GPKD số 0312345678 cấp bởi Sở Kế hoạch và Đầu tư Thành Phố Hà Nội ngày 07/06/2010
+                    </p>
+                    <p class="footer--h2"><i class="fal fa-phone fa-rotate-90" style="color: #c4def6;"></i> <i class="ti-mobile"></i> Điện thoại: 1800 1008 - 0971234567</p>
+                    <p class="footer--h2"><i class="ti-email"></i> Email liên hệ: Takehiro@busi.vn</p>
+                  </div>
+                  <div class="footer__p2">
+                    <p class="footer--h1">Kết nối với Takehiro</p>
+                    <ul class="footer--h15">
+                      <li class="footer__p2ListItem"><a href="" class="footer--h2"><i class="ti-facebook"> </i> Facebook</a></li>
+                      <li class="footer__p2ListItem"><a href="" class="footer--h2"><i class="ti-twitter"> </i> Twitter</a></li>
+                      <li class="footer__p2ListItem"><a href="" class="footer--h2"><i class="ti-youtube"> </i> Youtube</a></li>
+                      <li class="footer__p2ListItem"><a href="" class="footer--h2"><i class="ti-instagram"> </i> Instagram</a></li>
+                    </ul>
+                  </div>
+                  <div class="footer__p3">
+                    <img class="footer__p3logo" src="./assets/img/logobocongthuong.png" alt="đã thông báo với bộ công thương">
+                    <img class="footer__p3logo" src="./assets/img/dmca-logo.png" alt="">
+                  </div>
+              </footer>
+        </div>
+        <div class="footer2">
+            <footer class="footer">
+              <div class="footer__logo">
+                <img class="footer__logoImg" src="./assets/img/logo.png" alt="logo công ty">
+              </div>
+              <div class="footer__cpn">
+                <p class="footer__name">Takehiro Rent Car</p>
+              </div>
+              <div class="footer__slogan">Best Service, Right Time, Right People</div>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

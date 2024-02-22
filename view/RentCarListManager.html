@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="./assets/img/logo.png"/>
+    <link rel="stylesheet" href="./assets/fonts/themify-icons/themify-icons.css">
+    <link rel="stylesheet" href="./assets/css/preset.css">
+    <link rel="stylesheet" href="./assets/css/base.css">
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/home.css">
+    <link rel="stylesheet" href="./assets/css/RentalCarList.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap&subset=vietnamese" rel="stylesheet">
+    <title>Rent Car List</title>
+    <style>
+      /* Định dạng bảng */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        /*width: 870px; /* Tăng kích thước bảng */
+        /*height: 650px;*/
+        margin: 0 auto; /* Căn giữa bảng */
+        overflow-x: auto;
+        height:auto;
+      }
+  
+      /* Định dạng hàng đầu tiên (tiêu đề cột) */
+      thead th {
+        background-color: #33b0b9;
+        font-weight: bold;
+        padding: 12px; /* Tăng kích thước padding */
+        text-align: left;
+      }
+  
+      /* Định dạng các ô dữ liệu */
+      tbody td {
+        border: 1px solid #ddd;
+        padding: 12px; /* Tăng kích thước padding */
+        background-color: #ffffff74;
+      }
+  
+      /* Định dạng các ô dữ liệu đặc biệt (ví dụ: cột đầu tiên) */
+      tbody td:first-child {
+        font-weight: bold;
+      }
+    </style>
+          
+  <!-- ... Các đoạn mã trước đây ... -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Biến địa phương để lưu trạng thái tạm thời
+    let temporaryStatus;
+    // Biến địa phương để lưu mã đơn hàng
+    let orderId;
+
+    // Hàm để làm mới dữ liệu
+    function refreshData() {
+        fetch('/getRentalOrders')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('customerTableBody');
+                tableBody.innerHTML = '';
+
+                data.forEach(row => {
+                    const newRow = tableBody.insertRow();
+                    newRow.insertCell(0).textContent = row.OrderID;
+                    newRow.insertCell(1).textContent = row.CustomerName;
+                    newRow.insertCell(2).textContent = row.CustomerAddress;
+                    newRow.insertCell(3).textContent = row.PhoneNumber;
+                    newRow.insertCell(4).textContent = row.CarName;
+                    newRow.insertCell(5).textContent = row.PickupDate;
+                    newRow.insertCell(6).textContent = row.ReturnDate;
+
+                    const orderStatusCell = newRow.insertCell(7);
+                    const select = document.createElement('select');
+                    select.setAttribute('data-order-id', row.OrderID);
+                    select.innerHTML = `
+                        <option value="Đã duyệt" ${row.OrderStatus === 'Đã duyệt' ? 'selected' : ''}>Đã duyệt</option>
+                        <option value="Chờ duyệt" ${row.OrderStatus === 'Chờ duyệt' ? 'selected' : ''}>Chờ duyệt</option>
+                        <option value="Đã hủy" ${row.OrderStatus === 'Đã hủy' ? 'selected' : ''}>Đã hủy</option>
+                    `;
+
+                    select.value = row.OrderStatus;
+                    orderStatusCell.appendChild(select);
+
+                    // Sự kiện change để lưu trạng thái tạm thời khi thay đổi select
+                    select.addEventListener('change', function () {
+                        orderId = select.getAttribute('data-order-id');
+                        temporaryStatus = select.value;
+                        console.log('New Status:', temporaryStatus);
+                    });
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    refreshData();
+
+    const saveButton = document.getElementById('saveButton');
+    saveButton.addEventListener('click', async function () {
+        // Kiểm tra xem temporaryStatus có giá trị hợp lệ hay không
+        if (['Đã duyệt', 'Chờ duyệt', 'Đã hủy'].includes(temporaryStatus)) {
+            const params = new URLSearchParams();
+            params.append('orderId', orderId);
+            params.append('temporaryStatus', temporaryStatus);
+
+            try {
+                const response = await fetch('/updateOrderStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params,
+                });
+
+                const result = await response.text();
+
+                console.log(result); // In thông báo từ server vào console (có thể xóa sau khi chắc chắn hoạt động đúng)
+                // Hiển thị thông báo nếu cập nhật thành công
+                if (result === 'Update successful') {
+                    alert('Cập nhật thành công');
+                } else {
+                  alert('Cập nhật thất bại');
+                }
+                // Sau khi cập nhật thành công, làm mới dữ liệu để hiển thị trạng thái mới
+                refreshData();
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                // Xử lý lỗi tại đây nếu cần
+            }
+        } else {
+            console.error('Invalid temporaryStatus:', temporaryStatus);
+        }
+    });
+});
+
+
+  </script>
+  
+  <!-- ... Các đoạn mã sau đây ... -->
+  
+  
+</head>
+<body>
+    <div class="header">
+        <ul class="header__navleft">
+          <li class="header__listItem"><a class="header__link" href="homeManager.html"><img class="header__logo" src="./assets/img/Rent Car Taxi Cab Logo.png" alt="logo"></a></li>
+          <li class="header__listItem"><a class="header__link" href="homeManager.html">Trang Chủ</a></li>
+        </ul>
+        <ul class="header__navright">
+          <li class="header__listItem"><a class="header__link" href="signin.html">Đăng xuất</a></li>
+          <li class="header__listItem"><a class="header__link" href="helpManager.html">Hỗ Trợ</a></li>
+        </ul>
+      </div>
+    
+        <div class="content">
+          <div class="content__sidebar">
+            <p class="content__sidebarHeading">Chức năng</p>
+            <ul class="content__sidebarList">
+              <li class="content__sidebarItem"><a class="content__sidebarFunction" href="CarListManager.html">Danh sách xe</a></li>
+              <li class="content__sidebarItem"><a class="content__sidebarFunction" href="RentCarListManager.html">Danh sách thuê xe </a></li>
+              <li class="content__sidebarItem"><a class="content__sidebarFunction" href="listAccountManager.html">Danh sách tài khoản</a></li>
+          </div>
+        <div class="content__main">
+          <div class="content__layout2">
+              <div class="content__layout2p1">
+                <p class="content__layout2p1Heading">Danh sách tài khoản</p>
+                
+                 <!-- Thêm nút xác nhận -->
+                <button id="saveButton" class="content__layout1p1BtnSubmit">Lưu trạng thái</button>
+              </div>
+              <div class="content__layout2p2">
+
+              <table id="customerTable" class="hidden">
+                <thead>
+                  <tr>
+                      <th>Mã đơn</th>
+                      <th>Tên khách hàng</th>
+                      <th>Địa chỉ khách hàng</th>
+                      <th>Số điện thoại</th>
+                      <th>Tên xe</th>
+                      <th>Ngày lấy xe</th>
+                      <th>Ngày trả xe</th>
+                      <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="customerTableBody"></tbody>
+              </table>
+              <!-- <style>
+                .hidden {
+                  display: none;
+                }
+              </style> -->
+                
+              </div>
+          </div>
+        </div>
+    </div>
+
+    <div id="footer">
+        <div class="footer">
+              <footer class="footer">
+                  <div class="footer__p1">
+                    <p class="footer--h1">Công ty cho thuê xe Takehiro</p>
+                    <div class="footer--h2"> <i class="ti-location-pin"></i>
+                      <a class="footer__link" href="https://goo.gl/maps/GX8fSM2AWNVL1nPk6"> Số 10 Giải Phóng, Hai Bà Trưng, Hà Nội</a>   
+                      <div class="map-box"><img class="maps" src="./assets/img/AddressCpn.png" alt=""> </div>
+                    </div>
+                    <div class="clear"></div>
+                    <p class="footer--h2"> 
+                      <i class="ti-file"></i> GPKD số 0312345678 cấp bởi Sở Kế hoạch và Đầu tư Thành Phố Hà Nội ngày 07/06/2010
+                    </p>
+                    <p class="footer--h2"><i class="fal fa-phone fa-rotate-90" style="color: #c4def6;"></i> <i class="ti-mobile"></i> Điện thoại: 1800 1008 - 0971234567</p>
+                    <p class="footer--h2"><i class="ti-email"></i> Email liên hệ: Takehiro@busi.vn</p>
+                  </div>
+                  <div class="footer__p2">
+                    <p class="footer--h1">Kết nối với Takehiro</p>
+                    <ul class="footer--h15">
+                      <li class="footer__p2ListItem"><a href="" class="footer--h2"><i class="ti-facebook"> </i> Facebook</a></li>
+                      <li class="footer__p2ListItem"><a href="" class="footer--h2"><i class="ti-twitter"> </i> Twitter</a></li>
+                      <li class="footer__p2ListItem"><a href="" class="footer--h2"><i class="ti-youtube"> </i> Youtube</a></li>
+                      <li class="footer__p2ListItem"><a href="" class="footer--h2"><i class="ti-instagram"> </i> Instagram</a></li>
+                    </ul>
+                  </div>
+                  <div class="footer__p3">
+                    <img class="footer__p3logo" src="./assets/img/logobocongthuong.png" alt="đã thông báo với bộ công thương">
+                    <img class="footer__p3logo" src="./assets/img/dmca-logo.png" alt="">
+                  </div>
+              </footer>
+        </div>
+        <div class="footer2">
+            <footer class="footer">
+              <div class="footer__logo">
+                <img class="footer__logoImg" src="./assets/img/logo.png" alt="logo công ty">
+              </div>
+              <div class="footer__cpn">
+                <p class="footer__name">Takehiro Rent Car</p>
+              </div>
+              <div class="footer__slogan">Best Service, Right Time, Right People</div>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>
